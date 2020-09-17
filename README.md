@@ -1,4 +1,5 @@
 # Recommender System
+While the content of this project involves recommender systems, it is intended more as an opportunity to integrate multiple techniques to solve a realistic, large-scale applied problem.
 
 ##### Physical objects occupy space
 
