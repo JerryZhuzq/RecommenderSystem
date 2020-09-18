@@ -155,7 +155,7 @@ Relevant code script: extension.py
 We choose to compare Spark's parallel ALS model to a LightFM model as our project extension.
 
 ```python
-def Trans(train_df,test_df):
+def trans(train_df,test_df):
     id_cols = ['user_id', 'book_id']
     trans_cat_train = dict()
     trans_cat_test = dict()
@@ -187,7 +187,7 @@ if __name__ == "__main__":
     test = spark.read.csv(f'{sys.argv[1]}/test.csv',header=True).sample(fraction=1,seed=0).toPandas().drop(['is_read','is_reviewed'],axis=1)
     validation = spark.read.csv(f'{sys.argv[1]}/validation.csv',header=True).sample(fraction=1,seed=0).toPandas().drop(['is_read','is_reviewed'],axis=1)
 
-    train, test = Trans(train,validation)
+    train, test = trans(train,validation)
     model=LightFM(no_components=5,loss='warp')
     StartT = time.time()
     model.fit(train,epochs=30,num_threads=5)
