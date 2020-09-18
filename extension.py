@@ -11,7 +11,8 @@ from scipy.sparse import coo_matrix
 import pandas as pd
 import time
 
-def Trans(train_df,test_df):
+
+def trans(train_df,test_df):
     id_cols = ['user_id', 'book_id']
     trans_cat_train = dict()
     trans_cat_test = dict()
@@ -29,7 +30,8 @@ def Trans(train_df,test_df):
     train = coo_matrix((ratings['train'], (trans_cat_train['user_id'], trans_cat_train['book_id'])),shape=(n_users, n_items))
     test = coo_matrix((ratings['test'], (trans_cat_test['user_id'], trans_cat_test['book_id'])),shape=(n_users, n_items))
     return train, test
-    
+
+
 if __name__ == "__main__":
     spark = (SparkSession.builder
              .master("local")
@@ -43,16 +45,14 @@ if __name__ == "__main__":
     test = spark.read.csv(f'{sys.argv[1]}/test.csv',header=True).sample(fraction=1,seed=0).toPandas().drop(['is_read','is_reviewed'],axis=1)
     validation = spark.read.csv(f'{sys.argv[1]}/validation.csv',header=True).sample(fraction=1,seed=0).toPandas().drop(['is_read','is_reviewed'],axis=1)
 
-    train, test = Trans(train,validation)
-    model=LightFM(no_components=5,loss='warp')
+    train, test = trans(train,validation)
+    model = LightFM(no_components=5,loss='warp')
     StartT = time.time()
     model.fit(train,epochs=30,num_threads=5)
     EndT = time.time()
     t = EndT - StartT
     print(f"The running time is : {t}")
     PrecisionAtK = precision_at_k(model, test, k=500).mean()
-    #AUC = auc_score(model, test, K=500).mean()
     
     print(f"The Precision At K evaluation result is: {PrecisionAtK}")
-    #print(f"The auc score is : {AUC}")
 
